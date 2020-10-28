@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs');
 
 (async () => {
 
@@ -65,12 +64,37 @@ const fs = require('fs');
         const value = await page.evaluate(el => el.textContent, allMessages[i]);
         const dataArray = value.toString().split(" ");
         messageMap.set(dataArray[0],dataArray[1]);
-        const splitValue = dataArray[1].toString().match(/\d/g);
-        console.log(splitValue.length);
-        const splitLeeteral =dataArray[1].toString().match(/[a-z]/g);
-        console.log('===='+splitLeeteral.length);
-    }
 
-    ааа
-    await browser.close();
+        const splitValue = new Array();
+        const splitLeteral = new Array();
+        splitValue[i] = dataArray[1].toString().match(/\d/g);
+        splitLeteral[i] = dataArray[1].toString().match(/[a-z]/g);
+    }
+    await page.waitForXPath(buttonWriteLetter);
+    const buttonWrite = await page.$x(buttonWriteLetter);
+    await buttonWrite[0].click({delay:20});
+
+    await page.waitForXPath(emailField);
+    const inputMail = await page.$x(emailField);
+    await inputMail[0].type(mailName,{delay: 30})
+
+    await page.waitForXPath(emailTheme);
+    const inputTheme = await page.$x(emailTheme);
+    await inputTheme[0].type('Last one',{delay:50});
+
+    await page.waitForSelector("iframe");
+    const elementFrame = await page.$(`#mce_0_ifr`);
+    const frame = await elementFrame.contentFrame();
+    await frame.waitForSelector('#tinymce');
+
+    const emailBody = await frame.$('#tinymce');
+    let iter = 0;
+    for (let key of messageMap.keys()) {
+
+        await emailBody.type('"Received mail on theme '+key+' with message: '+messageMap.get(key)+'. It contains '+splitLeteral[iter]+'', {delay: 200});
+        const buttonSend = await page.$x('//button[text()=\'Надіслати\']');
+        await buttonSend[0].click({delay: 20});
+        iter++;
+    }
+    //await browser.close();
 })();
