@@ -18,7 +18,8 @@ const puppeteer = require('puppeteer');
     await buttonLogin[0].click({delay:20});
 
     /* Sending 10 letters */
-   for(let i = 0; i < 2; i++){
+   for(let i = 0; i < 10; i++){
+        const randomTextMessage = Math.random().toString(36).substring(2, 12);
 
         await page.waitForXPath(buttonWriteLetter);
         const buttonWrite = await page.$x(buttonWriteLetter);
@@ -28,18 +29,15 @@ const puppeteer = require('puppeteer');
         const inputMail = await page.$x(emailField);
         await inputMail[0].type(mailName,{delay: 30})
 
-        const randomTextTheme = Math.random().toString(36).substring(2, 7);
 
         await page.waitForXPath(emailTheme);
         const inputTheme = await page.$x(emailTheme);
-        await inputTheme[0].type(randomTextTheme,{delay:50});
+        await inputTheme[0].type(`"Theme#${i}"`,{delay:20});
 
         await page.waitForSelector("iframe");
         const elementFrame = await page.$(`#mce_${i}_ifr`);
         const frame = await elementFrame.contentFrame();
         await frame.waitForSelector('#tinymce');
-
-        const randomTextMessage = Math.random().toString(36).substring(2, 12);
 
         const emailBody = await frame.$('#tinymce');
         await emailBody.type(randomTextMessage,{delay:20});
@@ -59,17 +57,26 @@ const puppeteer = require('puppeteer');
     const allMessages = await page.$x('//tbody/tr/td[contains(@class,\'subject\')]');
     const messageMap = new Map();
 
+    function getVowels(str) {
+        if (str === null) {
+            return 0;
+        }
+        return str.length;
+    }
+    const splitValue = new Array();
+    const splitLeteral = new Array();
     for(let i = 0; i < allMessages.length;i++){
 
         const value = await page.evaluate(el => el.textContent, allMessages[i]);
         const dataArray = value.toString().split(" ");
         messageMap.set(dataArray[0],dataArray[1]);
 
-        const splitValue = new Array();
-        const splitLeteral = new Array();
         splitValue[i] = dataArray[1].toString().match(/\d/g);
+        splitValue[i] = getVowels(splitValue[i]);
         splitLeteral[i] = dataArray[1].toString().match(/[a-z]/g);
+        splitLeteral[i] = getVowels(splitLeteral[i]);
     }
+
     await page.waitForXPath(buttonWriteLetter);
     const buttonWrite = await page.$x(buttonWriteLetter);
     await buttonWrite[0].click({delay:20});
@@ -81,20 +88,31 @@ const puppeteer = require('puppeteer');
     await page.waitForXPath(emailTheme);
     const inputTheme = await page.$x(emailTheme);
     await inputTheme[0].type('Last one',{delay:50});
-
-    await page.waitForSelector("iframe");
-    const elementFrame = await page.$(`#mce_0_ifr`);
-    const frame = await elementFrame.contentFrame();
-    await frame.waitForSelector('#tinymce');
-
-    const emailBody = await frame.$('#tinymce');
     let iter = 0;
+
+
+
     for (let key of messageMap.keys()) {
 
-        await emailBody.type('"Received mail on theme '+key+' with message: '+messageMap.get(key)+'. It contains '+splitLeteral[iter]+'', {delay: 200});
-        const buttonSend = await page.$x('//button[text()=\'Надіслати\']');
-        await buttonSend[0].click({delay: 20});
+        await page.waitForSelector("iframe");
+        const elementFrame = await page.$(`#mce_${11}_ifr`);
+        const frame = await elementFrame.contentFrame();
+        await frame.waitForSelector('#tinymce');
+
+
+        const emailBody = await frame.$('#tinymce');
+        await emailBody.type(`"Received mail on theme ${key} with message: ${messageMap.get(key)}. It contains ${splitLeteral[iter]} letters and ${splitValue[iter]} numbers"\n`,{delay:20});
+
+
+       // const textLastOne = await page.$x('//body[@id= \'tinymce\']/div');
+       // await textLastOne[0].type(`"Received mail on theme ${key} with message: ${messageMap.get(key)}. It contains ${splitLeteral[iter]} letters and ${getVowels(splitValue[iter])} numbers"`, {delay: 2000});
+
         iter++;
+
     }
+    debugger;
+    const buttonSend = await page.$x('//button[text()=\'Надіслати\']');
+    await buttonSend[0].click({delay: 20});
+    dfdf
     //await browser.close();
 })();
