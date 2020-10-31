@@ -23,16 +23,15 @@ const puppeteer = require('puppeteer');
 
         await page.waitForXPath(buttonWriteLetter);
         const buttonWrite = await page.$x(buttonWriteLetter);
-        await buttonWrite[0].click({delay:20});
+        await buttonWrite[0].click({delay:5});
 
         await page.waitForXPath(emailField);
         const inputMail = await page.$x(emailField);
-        await inputMail[0].type(mailName,{delay: 30})
-
+        await inputMail[0].type(mailName,{delay: 5})
 
         await page.waitForXPath(emailTheme);
         const inputTheme = await page.$x(emailTheme);
-        await inputTheme[0].type(`"Theme#${i}"`,{delay:20});
+        await inputTheme[0].type(`"Theme#${i}"`,{delay:5});
 
         await page.waitForSelector("iframe");
         const elementFrame = await page.$(`#mce_${i}_ifr`);
@@ -40,9 +39,9 @@ const puppeteer = require('puppeteer');
         await frame.waitForSelector('#tinymce');
 
         const emailBody = await frame.$('#tinymce');
-        await emailBody.type(randomTextMessage,{delay:20});
+        await emailBody.type(randomTextMessage,{delay:5});
         const buttonSend = await page.$x('//button[text()=\'Надіслати\']');
-        await buttonSend[0].click({delay:20});
+        await buttonSend[0].click({delay:5});
 
         await page.waitForXPath('//button[text()=\'Написати ще\']', {visible: true});
         const buttonSendOneMore = await page.$x('//button[text()=\'Написати ще\']');
@@ -79,19 +78,17 @@ const puppeteer = require('puppeteer');
 
     await page.waitForXPath(buttonWriteLetter);
     const buttonWrite = await page.$x(buttonWriteLetter);
-    await buttonWrite[0].click({delay:20});
+    await buttonWrite[0].click({delay:5});
 
     await page.waitForXPath(emailField);
     const inputMail = await page.$x(emailField);
-    await inputMail[0].type(mailName,{delay: 30})
+    await inputMail[0].type(mailName,{delay: 5})
 
     await page.waitForXPath(emailTheme);
     const inputTheme = await page.$x(emailTheme);
-    await inputTheme[0].type('Last one',{delay:50});
+    await inputTheme[0].type('Last one',{delay:5});
+
     let iter = 0;
-
-
-
     for (let key of messageMap.keys()) {
 
         await page.waitForSelector("iframe");
@@ -99,20 +96,23 @@ const puppeteer = require('puppeteer');
         const frame = await elementFrame.contentFrame();
         await frame.waitForSelector('#tinymce');
 
-
         const emailBody = await frame.$('#tinymce');
-        await emailBody.type(`"Received mail on theme ${key} with message: ${messageMap.get(key)}. It contains ${splitLeteral[iter]} letters and ${splitValue[iter]} numbers"\n`,{delay:20});
-
-
-       // const textLastOne = await page.$x('//body[@id= \'tinymce\']/div');
-       // await textLastOne[0].type(`"Received mail on theme ${key} with message: ${messageMap.get(key)}. It contains ${splitLeteral[iter]} letters and ${getVowels(splitValue[iter])} numbers"`, {delay: 2000});
+        await emailBody.type(`"Received mail on theme ${key} with message: ${messageMap.get(key)}. It contains ${splitLeteral[iter]} letters and ${splitValue[iter]} numbers"\n`,{delay:5});
 
         iter++;
-
     }
-    debugger;
+
     const buttonSend = await page.$x('//button[text()=\'Надіслати\']');
     await buttonSend[0].click({delay: 20});
-    dfdf
-    //await browser.close();
+
+    await page.$x('//span[text()=\'Вхідні\']');
+    await buttonInEmail[0].click({delay:20});
+
+    const selectAllLetters = await page.$x('//div[@class =\'msglist__checkbox\']/label/span');
+    await selectAllLetters[0].click({delay: 20});
+
+    const deleteLetters = await page.$x('//div[@class = \'controls controls_msglist\']/div/a[text()=\'Видалити\']');
+    await deleteLetters[0].click({delay: 20});
+
+   //await browser.close();
 })();
