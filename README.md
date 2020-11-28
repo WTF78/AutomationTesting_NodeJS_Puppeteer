@@ -8,5 +8,6 @@ TestMail
 5. Полученную информацию отправить себе же следующим сообщенем в таком виде: "Received mail on theme {тема письма} with message: {текст письма}. It contains {кол-во букв в письме} letters and {кол-во цифр в письме} numbers". В таком формате должно быть перечисленно содержание всех полученных сообщений.
 6. Удалить все письма, кроме последнего.
 
-1. npm install
-2. node index.js
+Terminal commant to test.
+npm install
+node index.js
