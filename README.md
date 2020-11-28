@@ -9,5 +9,5 @@ TestMail
 6. Удалить все письма, кроме последнего.
 
 Terminal commant to test.
-npm install
-node index.js
+-npm install
+-node index.js
