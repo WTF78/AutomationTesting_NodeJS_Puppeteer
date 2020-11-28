@@ -1,4 +1,4 @@
-# project1
+# Automation Test
 TestMail
 
 1. Залогиниться в почту (любую) через браузер.
